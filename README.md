@@ -1,8 +1,7 @@
 ---
 title: Structural geology 2
 subtitle: Teaching materials
-author:
-- Ondrej Lexa
+author: Ondrej Lexa
 institute: ÚPSG, Charles University
 ---
 
