@@ -11,10 +11,9 @@ def def_ellipse(F):
 
 def dis_field(J):
     # Visualize displacement gradient field
-    Xg, Yg = np.meshgrid(np.linspace(-3, 3, 21),
+    X, Y = np.meshgrid(np.linspace(-3, 3, 21),
                          np.linspace(-2, 2, 17))
-    X, Y = Xg.flatten(), Yg.flatten()
-    u, v = np.dot(J, [X, Y])
+    u, v = np.tensordot(J, [X, Y], axes=1)
     plt.quiver(X, Y, u, v, angles='xy')
     plt.axis('equal')
 
@@ -27,7 +26,7 @@ def dis_ellipse(J):
 def def_field(F):
     # Visualize deformation gradient
     F = np.asarray(F)
-    J = F - np.eye(F.ndim)
+    J = F - np.eye(2)
     dis_field(J)
 
 class Tensor(np.ndarray):
