@@ -1,77 +1,56 @@
-import numpy as np
-import matplotlib.pyplot as plt
+# Library of routines for 2D deformation visualization
+#
+# Ondrej Lexa 2017
+
+from pylab import *
+from scipy import linalg as la
 
 def def_ellipse(F):
-    # Draw unit circle transformed to strain ellipse
-    theta = np.linspace(0, 2*np.pi, 180)
-    xc, yc = np.cos(theta), np.sin(theta)
-    x,y = np.dot(F, [xc,yc])
-    plt.plot(xc, yc, 'r', x, y, 'g')
-    plt.axis('equal')
-
-def dis_field(J):
-    # Visualize displacement gradient field
-    X, Y = np.meshgrid(np.linspace(-3, 3, 21),
-                         np.linspace(-2, 2, 17))
-    u, v = np.tensordot(J, [X, Y], axes=1)
-    plt.quiver(X, Y, u, v, angles='xy')
-    plt.axis('equal')
+    # Draw strain ellipse from deformation gradient
+    theta = linspace(0, 2*pi, 180)
+    xc, yc = cos(theta), sin(theta)
+    x,y = dot(F, [xc,yc])
+    plot(xc, yc, 'r', x, y, 'g')
+    u, s, v = svd(F)
+    plot(x, y, 'k', lw=2)
+    quiver(zeros(2), zeros(2),
+               hstack((s*u[0],-s*u[0])), hstack((s*u[1],-s*u[1])),
+               scale=1, units='xy')
+    axis('equal')
 
 def dis_ellipse(J):
-    # Draw ellipse from displacement gradient
-    J = np.asarray(J)
-    F = J + np.eye(J.ndim)
+    # Draw strain ellipse from displacement gradient
+    J = asarray(J)
+    F = J + eye(2)
     def_ellipse(F)
 
+def dis_field(J):
+    # Visualize displacement field from
+    # displacement gradient
+    X, Y = meshgrid(linspace(-3, 3, 21),
+                    linspace(-2, 2, 17))
+    u, v = tensordot(J, [X, Y], axes=1)
+    quiver(X, Y, u, v, angles='xy')
+    axis('equal')
+
 def def_field(F):
-    # Visualize deformation gradient
-    F = np.asarray(F)
-    J = F - np.eye(2)
+    # Visualize displacement field from
+    # deformation gradient
+    F = asarray(F)
+    J = F - eye(2)
     dis_field(J)
 
-class Tensor(np.ndarray):
+def dis_show(J):
+    # Draw displacement field and deformation ellipse
+    # from displacement gradient
+    dis_field(J)
+    dis_ellipse(J)
+    show()
 
-    def __new__(cls, input_array):
-        obj = np.asarray(input_array).view(cls)
-        return obj
-
-    @property
-    def I(self):
-        return np.linalg.inv(self)
-
-    @property
-    def evals(self):
-        evals, evecs = np.linalg.eig(self)
-        six = np.argsort(evals)[::-1]
-        return evals[six]
-
-    @property
-    def evecs(self):
-        evals, evecs = np.linalg.eig(self)
-        six = np.argsort(evals)[::-1]
-        return np.asarray(evecs[:,six].T)
-
-    def powm(self, n):
-        return np.linalg.matrix_power(self, n)
-
-    def sqrtm(self):
-        from scipy.linalg import sqrtm
-        return sqrtm(self).view(Tensor)
-
-    def plot(self):
-        theta = np.linspace(0, 2*np.pi, 180)
-        xc, yc = np.cos(theta), np.sin(theta)
-        x, y = self.dot([xc, yc])
-        u, s, v = np.linalg.svd(self)
-        plt.plot(x, y, 'k', lw=2)
-        plt.quiver(np.zeros(2*self.ndim),
-                   np.zeros(2*self.ndim),
-                   np.hstack((s*u[0],-s*u[0])),
-                   np.hstack((s*u[1],-s*u[1])),
-                   scale=1, units='xy')
-        plt.axis('equal')
-
-    def show(self):
-        self.plot()
-        plt.show()
+def def_show(F):
+    # Draw displacement field and deformation ellipse
+    # from deformation gradient
+    def_field(F)
+    def_ellipse(F)
+    show()
 
