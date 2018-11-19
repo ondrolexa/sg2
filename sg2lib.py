@@ -54,3 +54,11 @@ def def_show(F):
     def_ellipse(F)
     show()
 
+def densify_list_xy(x, y, n=500, per=True):
+    from scipy import interpolate
+    if per and (x[0] != x[-1]) and (x[0] != x[-1]):
+        x.append(x[0])
+        y.append(y[0])
+    tck, u = interpolate.splprep([x, y], s=0, k=1, per=per)
+    return interpolate.splev(np.linspace(0, 1, n), tck)
+    
